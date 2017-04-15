@@ -1,13 +1,24 @@
 #functions for network
 import socket
 
-def TestTCP(server, port):
+
+# Simple TCP connection checker
+def TestTCP(env):
     s = socket.socket()
     try:
-        s.connect((server, port))
-    except Exception as e:
-        print("something's wrong with %s:%d. Exception is %s" % (server, port, e))
-    finally:
+        s.connect((env.hosts[0], int(env.port)))
+        print 'TCP connection connection succesfull!'
         s.close()
+        return True
+    except Exception as e:
+        print("something's wrong with %s:%s. Exception is %s" % (env.hosts[0], env.port, e))
+        s.close()
+        return False
 
 
+
+def TestSSH(env):
+    pass
+
+def TestPing(env):
+    pass
