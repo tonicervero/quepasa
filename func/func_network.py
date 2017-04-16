@@ -1,6 +1,7 @@
 #functions for network
 import socket
-
+import fabric
+from fabric.api import *
 
 # Simple TCP connection checker
 def TestTCP(env):
@@ -15,10 +16,10 @@ def TestTCP(env):
         s.close()
         return False
 
-
-
+# Simple SSH connection checker
 def TestSSH(env):
-    pass
+    print 'Testing SSH connection to '+env.hosts[0]+':'+env.port+'...'
+    run('uname -a')
 
 def TestPing(env):
     pass

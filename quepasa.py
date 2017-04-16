@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 
 #Quepasa is free software
 #Quepasa is meant to perform quick analysis of server problems
@@ -19,11 +19,18 @@ from inspect import *
 import func
 from func.func_network import *
 
-
+def GetFunctions():
+    functions = []
+    functions_list = [o for o in getmembers(func.func_network) if isfunction(o[1])]
+    for function in functions_list:
+        functions.append(function[0])
+    return functions
 
 def SetFabEnv(opts):
     env.user = opts.serveruser
-    env.hosts = [opts.server]
+    env.host = opts.server
+    env.hosts.append(opts.server)
+    env.host_string = opts.server
     env.port = opts.port
     env.gateway = opts.gateway
     return env
@@ -32,13 +39,14 @@ if __name__ == '__main__':
 
     #Parsing arguments
     parser = argparse.ArgumentParser(description='Quepasa 0.1 diagnosis and troubleshooting tool')
-    parser.add_argument('-s','--server', dest='server', help='Target server for runbook', default='127.0.0.1', required=True)
+    parser.add_argument('-s','--server', dest='server', help='Target server for runbook', default='127.0.0.1', required=False)
     parser.add_argument('-p','--port', dest='port', help='SSH port for target', default=22, required=False)
     parser.add_argument('-u','--serveruser', dest='serveruser', help='SSH user for target', required=False)
     parser.add_argument('-g','--gateway', dest='gateway', help='Gateway or bastion server to reach the target server', required=False)
     parser.add_argument('-q','--gatewayport', dest='gatewayport', help='Gateway or bastion server ssh port', default=22, required=False)
     parser.add_argument('-r','--runbook', dest='runbook', help='Specific runbook, set of functions for run', required=False)
     parser.add_argument('-f','--function', dest='function', help='Specific function to run', required=False)
+    parser.add_argument('-fl', '--function-list', dest='functionlist', help='List the functions available', action='store_false', default='all')
     #   parser.add_argument('-h','--help', dest='help', help='Prints help', required=False)
     opts = parser.parse_args()
 
@@ -59,22 +67,20 @@ if __name__ == '__main__':
     # 'parallel': False, 'sudo_user': None, 'ok_ret_codes': [0]}
 
     env = SetFabEnv(opts)
-
     #print dir(func.func_network)
-    functions_list = [o for o in getmembers(func.func_network) if isfunction(o[1])]
-    print functions_list
+    funcList = GetFunctions()
 
-    funcIndex = {'testtcp': TestTCP}
-
-    function_name = opts.function  # set by the command line options
-    if function_name in funcIndex:
-        funcIndex[function_name](env)  # + argument list of course
+    if not opts.functionlist:
+        print 'below the list of functions available:'
+        for f in funcList:
+            print f
     else:
-        raise Exception("Method %s not implemented" % function_name)
-
-#    print opts.server
-
-
+        function_name = opts.function  # set by the command line options
+        if function_name in funcList:
+            funcIndex = funcList.index(function_name)
+            globals()[funcList[funcIndex]](env)
+        else:
+            print "Method %s not implemented" % function_name
 
 
 # before end of execution need to make sure all connections are closed:
