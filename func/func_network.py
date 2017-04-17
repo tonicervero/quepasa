@@ -18,8 +18,15 @@ def TestTCP(env):
 
 # Simple SSH connection checker
 def TestSSH(env):
-    print 'Testing SSH connection to '+env.hosts[0]+':'+env.port+'...'
-    run('uname -a')
+    print 'Testing SSH connection to ' + env.hosts[0] + ':' + str(env.port) + '...'
+    with settings(hide('warnings', 'running', 'stderr'),warn_only=True):
+        try:
+            output = run('echo "HOST:`hostname`: SSH connection succesful"')
+            return True
+        except Exception as e:
+            print(("something's wrong with %s:%s. Exception is %s" % (env.hosts[0], str(env.port), e)))
+            return False
 
+# Simple ICMP checker
 def TestPing(env):
-    pass
+    print 'Testing ICMP (ping) to ' + env.hosts[0] + ':' + str(env.port) + '...'

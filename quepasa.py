@@ -84,6 +84,6 @@ if __name__ == '__main__':
 
 
 # before end of execution need to make sure all connections are closed:
-#for key in connections.keys():
-#    connections[key].close()
-#    del connections[key]
+    #for key in connections.keys():
+    #    connections[key].close()
+    #del connections[key]
